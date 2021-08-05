@@ -1,15 +1,20 @@
 import 'package:audio_service/audio_service.dart';
 import 'package:backgroud_service_app/audio_service_module.dart';
 import 'package:backgroud_service_app/firebase_module.dart';
+import 'package:backgroud_service_app/local_notification_module.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  await FirebaseModule().configure();
-  await AudioService.connect();
-  await AudioService.start(backgroundTaskEntrypoint: _backgroundTaskEntrypoint);
+  // await Firebase.initializeApp();
+
+  // await FirebaseModule().configure();
+  // await AudioService.connect();
+  // await AudioService.start(backgroundTaskEntrypoint: _backgroundTaskEntrypoint);
+  LocalNotificationModule.instance.showDailyAtTimeNotification(0, Time(02, 36, 0));
+  LocalNotificationModule.instance.showDailyAtTimeNotification(1, Time(02, 37, 0));
   runApp(MyApp());
 }
 

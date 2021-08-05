@@ -1,20 +1,42 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class LocalNotificationModule {
+  LocalNotificationModule._privateConstructor();
 
+  static final LocalNotificationModule instance =
+      LocalNotificationModule._privateConstructor();
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
-  FlutterLocalNotificationsPlugin();
+      FlutterLocalNotificationsPlugin();
 
-  Future<void> scheduleNotification() async {
-    Time time = Time(22, 30, 0);
+  Future<void> showDailyAtTimeNotification(int id, Time time) async {
     AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
         "1", "channelName", "channel Description",
         icon: "@mipmap/ic_launcher");
-
     IOSNotificationDetails iosDetails = IOSNotificationDetails();
     NotificationDetails generalNotificationDetails =
-    NotificationDetails(android: androidDetails, iOS: iosDetails);
+        NotificationDetails(android: androidDetails, iOS: iosDetails);
+    flutterLocalNotificationsPlugin.showDailyAtTime(
+        id, "Schedule", "$id", time, generalNotificationDetails);
 
-    // await flutterLocalNotificationsPlugin.zonedSchedule(0, "Schedule", "body", TgeneralNotificationDetails);
-}
+    final AndroidInitializationSettings initializationSettingsAndroid =
+        AndroidInitializationSettings('launch_background');
+
+    final IOSInitializationSettings initializationSettingsIOS =
+        IOSInitializationSettings();
+
+    final InitializationSettings initializationSettings =
+        InitializationSettings(
+      android: initializationSettingsAndroid,
+      iOS: initializationSettingsIOS,
+    );
+
+    await flutterLocalNotificationsPlugin.initialize(
+      initializationSettings,
+      onSelectNotification: (String? payload) async {
+        if (payload != null) {
+          print('notification payload: $payload');
+        }
+      },
+    );
+  }
 }
