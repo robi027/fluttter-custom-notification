@@ -1,3 +1,4 @@
+import 'package:audio_service/audio_service.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -16,12 +17,12 @@ class FirebaseModule {
 
   Future<void> configure() async {
     print("token ${await _firebaseMessaging.getToken()}");
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
     final AndroidInitializationSettings initializationSettingsAndroid =
         AndroidInitializationSettings('launch_background');
 
-    final IOSInitializationSettings initializationSettingsIOS = IOSInitializationSettings();
+    final IOSInitializationSettings initializationSettingsIOS =
+        IOSInitializationSettings();
 
     final InitializationSettings initializationSettings =
         InitializationSettings(
@@ -46,6 +47,8 @@ class FirebaseModule {
       },
     );
 
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       RemoteNotification? notification = message.notification;
       AndroidNotification? android = message.notification?.android;
@@ -55,12 +58,17 @@ class FirebaseModule {
       }
     });
 
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print('A new onMessageOpenedApp event was published!');
+      await AudioService.stop();
     });
   }
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message ${message.messageId}');
+  await AudioService.connect();
+  await AudioService.play();
 }
+
+
