@@ -4,6 +4,11 @@ import 'package:audio_service/audio_service.dart';
 import 'package:just_audio/just_audio.dart';
 
 class AudioServiceModule extends BackgroundAudioTask {
+  AudioServiceModule._privateConstructor();
+
+  static final AudioServiceModule instance =
+      AudioServiceModule._privateConstructor();
+
   AudioPlayer _player = AudioPlayer();
 
   Future<void> play() async {
@@ -15,16 +20,24 @@ class AudioServiceModule extends BackgroundAudioTask {
     await _player.stop();
   }
 
-  @override
-  Future<void> onPlay() async {
+  Future<void> start() async {
+    await AudioService.stop();
+    if (!AudioService.connected) await AudioService.connect();
+    await AudioService.start(
+        backgroundTaskEntrypoint: backgroundTaskEntrypoint);
+  }
+
+  onPlay() async {
     print("onPlay");
     await play();
   }
 
-  @override
-  Future<void> onStop() async {
+  onStop() async {
     print("onStop");
     await stop();
-    return super.onStop();
   }
+}
+
+void backgroundTaskEntrypoint() {
+  AudioServiceBackground.run(() => AudioServiceModule.instance);
 }

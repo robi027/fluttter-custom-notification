@@ -8,16 +8,15 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   await FirebaseModule().configure();
-  await AudioService.connect();
-  await AudioService.start(backgroundTaskEntrypoint: _backgroundTaskEntrypoint);
+  await AudioServiceModule.instance.start();
   runApp(MyApp());
 }
 
-void _backgroundTaskEntrypoint() {
-  AudioServiceBackground.run(() => AudioServiceModule());
-}
+class MyApp extends StatelessWidget with WidgetsBindingObserver {
+  MyApp() {
+    WidgetsBinding.instance?.addObserver(this);
+  }
 
-class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -27,6 +26,17 @@ class MyApp extends StatelessWidget {
       ),
       home: MyHomePage(title: 'Flutter Demo Home Page'),
     );
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
+    switch (state) {
+      case AppLifecycleState.detached:
+        //AudioServiceModule.instance.start();
+        WidgetsBinding.instance?.removeObserver(this);
+        break;
+      default:
+    }
   }
 }
 

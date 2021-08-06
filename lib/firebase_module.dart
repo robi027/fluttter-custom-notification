@@ -1,4 +1,5 @@
 import 'package:audio_service/audio_service.dart';
+import 'package:backgroud_service_app/audio_service_module.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
@@ -60,15 +61,12 @@ class FirebaseModule {
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
       print('A new onMessageOpenedApp event was published!');
-      await AudioService.stop();
     });
   }
 }
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print('Handling a background message ${message.messageId}');
-  await AudioService.connect();
+  if (!AudioService.connected) await AudioService.connect();
   await AudioService.play();
 }
-
-
